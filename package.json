@@ -1,0 +1,31 @@
+{
+  "name": "notification-service-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Multi-tenant notification service supporting Apple/Google push notifications, SMS, and Email",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspaces --if-present",
+    "build": "npm run build --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "backend:dev": "npm run dev -w packages/backend",
+    "frontend:dev": "npm run dev -w packages/frontend"
+  },
+  "keywords": [
+    "notifications",
+    "push-notifications",
+    "sms",
+    "email",
+    "multi-tenant",
+    "saas"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "typescript": "^5.3.3"
+  }
+}
