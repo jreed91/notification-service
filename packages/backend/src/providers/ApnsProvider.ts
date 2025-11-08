@@ -1,4 +1,4 @@
-import apn from '@apns/node-apns';
+import apn from 'apn';
 import { DeliveryChannel } from '@notification-service/shared';
 import { NotificationProvider, NotificationPayload, NotificationResult } from './NotificationProvider';
 
