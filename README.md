@@ -1,5 +1,8 @@
 # Notification Service
 
+![CI](https://github.com/jreed91/notification-service/workflows/CI/badge.svg)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 A comprehensive multi-tenant notification service built as a TypeScript monorepo with a React frontend and Node.js backend. Supports Apple Push Notifications (APNs), Google Push Notifications (FCM), SMS, and Email with full customization, variable substitution, translations, and subscription management.
 
 ## Features
@@ -299,6 +302,50 @@ CMD ["node", "dist/index.js"]
 ### Environment Variables for Production
 
 Ensure all sensitive credentials are properly configured through environment variables, not committed to source control.
+
+## Testing
+
+The project includes comprehensive test suites for both backend and frontend.
+
+### Running Tests
+
+```bash
+# Run all tests
+npm test
+
+# Run backend tests
+npm run test -w packages/backend
+
+# Run frontend tests
+npm run test -w packages/frontend
+
+# Run with coverage
+npm run test:coverage -w packages/backend
+npm run test:coverage -w packages/frontend
+```
+
+### Linting
+
+```bash
+# Lint all packages
+npm run lint
+
+# Auto-fix linting issues
+npm run lint:fix -w packages/backend
+npm run lint:fix -w packages/frontend
+```
+
+## CI/CD
+
+This project uses GitHub Actions for continuous integration. The CI pipeline:
+
+- Runs linting on all packages
+- Builds all TypeScript packages
+- Runs unit tests with Jest (backend) and Vitest (frontend)
+- Tests against multiple Node.js versions (18.x, 20.x)
+- Builds a Docker image for deployment
+
+See [CI/CD Documentation](docs/CI-CD.md) for more details.
 
 ## Contributing
 
