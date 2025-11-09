@@ -1,0 +1,27 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(tree:*)",
+      "Bash(npm install:*)",
+      "Bash(npm run db:generate:*)",
+      "Bash(npm uninstall:*)",
+      "Bash(npm run db:push:*)",
+      "Bash(cat:*)",
+      "Bash(docker-compose up:*)",
+      "Bash(docker compose:*)",
+      "Bash(.specify/scripts/bash/setup-plan.sh:*)",
+      "Bash(lsof:*)",
+      "Bash(npm run backend:dev:*)",
+      "Bash(npm run build:*)",
+      "Bash(kill:*)",
+      "Bash(xargs kill:*)",
+      "Bash(curl:*)",
+      "Bash(PGPASSWORD=postgres psql:*)",
+      "Bash(docker exec:*)",
+      "SlashCommand(/speckit.specify:*)",
+      "Bash(git fetch:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
