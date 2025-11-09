@@ -226,7 +226,9 @@ export function Users() {
       <CreateUserModal
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
-        onSubmit={(data) => createMutation.mutateAsync(data)}
+        onSubmit={async (data) => {
+          await createMutation.mutateAsync(data);
+        }}
       />
     </div>
   );

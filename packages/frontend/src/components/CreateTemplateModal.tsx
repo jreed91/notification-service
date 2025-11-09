@@ -180,7 +180,8 @@ export function CreateTemplateModal({ isOpen, onClose, onSubmit }: CreateTemplat
 
           {/* Subject (conditional) */}
           {(selectedChannels?.includes(DeliveryChannel.EMAIL) ||
-            selectedChannels?.includes(DeliveryChannel.PUSH)) && (
+            selectedChannels?.includes(DeliveryChannel.APPLE_PUSH) ||
+            selectedChannels?.includes(DeliveryChannel.GOOGLE_PUSH)) && (
             <div>
               <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-1">
                 Subject {selectedChannels?.includes(DeliveryChannel.EMAIL) && '*'}
@@ -199,7 +200,8 @@ export function CreateTemplateModal({ isOpen, onClose, onSubmit }: CreateTemplat
           )}
 
           {/* Title (conditional) */}
-          {selectedChannels?.includes(DeliveryChannel.PUSH) && (
+          {(selectedChannels?.includes(DeliveryChannel.APPLE_PUSH) ||
+            selectedChannels?.includes(DeliveryChannel.GOOGLE_PUSH)) && (
             <div>
               <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
                 Title

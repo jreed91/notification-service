@@ -38,7 +38,17 @@ describe('SendNotification', () => {
 
   it('should render send notification page title', async () => {
     vi.spyOn(templateApi.templateApi, 'list').mockResolvedValue({ templates: [] });
-    vi.spyOn(userApi.userApi, 'list').mockResolvedValue({ users: [] });
+    vi.spyOn(userApi.userApi, 'list').mockResolvedValue({
+      users: [],
+      pagination: {
+        page: 1,
+        limit: 10,
+        total: 0,
+        totalPages: 0,
+        hasNextPage: false,
+        hasPrevPage: false,
+      },
+    });
 
     renderSendNotification();
     expect(screen.getByRole('heading', { name: 'Send Notification' })).toBeInTheDocument();
@@ -46,7 +56,17 @@ describe('SendNotification', () => {
 
   it('should render description text', async () => {
     vi.spyOn(templateApi.templateApi, 'list').mockResolvedValue({ templates: [] });
-    vi.spyOn(userApi.userApi, 'list').mockResolvedValue({ users: [] });
+    vi.spyOn(userApi.userApi, 'list').mockResolvedValue({
+      users: [],
+      pagination: {
+        page: 1,
+        limit: 10,
+        total: 0,
+        totalPages: 0,
+        hasNextPage: false,
+        hasPrevPage: false,
+      },
+    });
 
     renderSendNotification();
     expect(screen.getByText(/Send a notification to a user/)).toBeInTheDocument();
@@ -69,7 +89,17 @@ describe('SendNotification', () => {
     vi.spyOn(templateApi.templateApi, 'list').mockResolvedValue({
       templates: mockTemplates,
     });
-    vi.spyOn(userApi.userApi, 'list').mockResolvedValue({ users: [] });
+    vi.spyOn(userApi.userApi, 'list').mockResolvedValue({
+      users: [],
+      pagination: {
+        page: 1,
+        limit: 10,
+        total: 0,
+        totalPages: 0,
+        hasNextPage: false,
+        hasPrevPage: false,
+      },
+    });
 
     renderSendNotification();
 
@@ -86,14 +116,24 @@ describe('SendNotification', () => {
         email: 'test@example.com',
         locale: 'en-US',
         tenantId: 'tenant-1',
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        apnsTokens: [],
+        fcmTokens: [],
+        createdAt: '2025-11-09T00:00:00Z',
+        updatedAt: '2025-11-09T00:00:00Z',
       },
     ];
 
     vi.spyOn(templateApi.templateApi, 'list').mockResolvedValue({ templates: [] });
     vi.spyOn(userApi.userApi, 'list').mockResolvedValue({
       users: mockUsers,
+      pagination: {
+        page: 1,
+        limit: 10,
+        total: 1,
+        totalPages: 1,
+        hasNextPage: false,
+        hasPrevPage: false,
+      },
     });
 
     renderSendNotification();
@@ -106,7 +146,17 @@ describe('SendNotification', () => {
 
   it('should display variables textarea', async () => {
     vi.spyOn(templateApi.templateApi, 'list').mockResolvedValue({ templates: [] });
-    vi.spyOn(userApi.userApi, 'list').mockResolvedValue({ users: [] });
+    vi.spyOn(userApi.userApi, 'list').mockResolvedValue({
+      users: [],
+      pagination: {
+        page: 1,
+        limit: 10,
+        total: 0,
+        totalPages: 0,
+        hasNextPage: false,
+        hasPrevPage: false,
+      },
+    });
 
     renderSendNotification();
 
@@ -117,7 +167,17 @@ describe('SendNotification', () => {
 
   it('should have send button', async () => {
     vi.spyOn(templateApi.templateApi, 'list').mockResolvedValue({ templates: [] });
-    vi.spyOn(userApi.userApi, 'list').mockResolvedValue({ users: [] });
+    vi.spyOn(userApi.userApi, 'list').mockResolvedValue({
+      users: [],
+      pagination: {
+        page: 1,
+        limit: 10,
+        total: 0,
+        totalPages: 0,
+        hasNextPage: false,
+        hasPrevPage: false,
+      },
+    });
 
     renderSendNotification();
 
@@ -144,7 +204,17 @@ describe('SendNotification', () => {
     vi.spyOn(templateApi.templateApi, 'list').mockResolvedValue({
       templates: mockTemplates,
     });
-    vi.spyOn(userApi.userApi, 'list').mockResolvedValue({ users: [] });
+    vi.spyOn(userApi.userApi, 'list').mockResolvedValue({
+      users: [],
+      pagination: {
+        page: 1,
+        limit: 10,
+        total: 0,
+        totalPages: 0,
+        hasNextPage: false,
+        hasPrevPage: false,
+      },
+    });
 
     renderSendNotification();
 
@@ -188,8 +258,10 @@ describe('SendNotification', () => {
         email: 'test@example.com',
         locale: 'en-US',
         tenantId: 'tenant-1',
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        apnsTokens: [],
+        fcmTokens: [],
+        createdAt: '2025-11-09T00:00:00Z',
+        updatedAt: '2025-11-09T00:00:00Z',
       },
     ];
 
@@ -198,6 +270,14 @@ describe('SendNotification', () => {
     });
     vi.spyOn(userApi.userApi, 'list').mockResolvedValue({
       users: mockUsers,
+      pagination: {
+        page: 1,
+        limit: 10,
+        total: 1,
+        totalPages: 1,
+        hasNextPage: false,
+        hasPrevPage: false,
+      },
     });
 
     renderSendNotification();

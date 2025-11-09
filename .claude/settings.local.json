@@ -27,7 +27,11 @@
       "Bash(then find /Users/jreed/bench/notification-service/specs/001-add-user-functionality/checklists -name \"*.md\" -type f)",
       "Bash(else echo \"NO_CHECKLISTS\")",
       "Bash(fi)",
-      "Bash(npm run lint:*)"
+      "Bash(npm run lint:*)",
+      "Bash(git log:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(git add:*)"
     ],
     "deny": [],
     "ask": []
