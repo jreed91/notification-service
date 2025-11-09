@@ -1,5 +1,6 @@
 import { EmailProvider } from '../../providers/EmailProvider';
 import { DeliveryChannel } from '@notification-service/shared';
+import * as nodemailer from 'nodemailer';
 
 // Mock the nodemailer module
 jest.mock('nodemailer', () => {
@@ -42,8 +43,7 @@ describe('EmailProvider', () => {
       process.env.SMTP_FROM_EMAIL = 'noreply@example.com';
       process.env.SMTP_FROM_NAME = 'Test Service';
 
-      const nodemailer = require('nodemailer');
-      nodemailer.createTransport.mockReturnValue({
+      (nodemailer.createTransport as jest.Mock).mockReturnValue({
         sendMail: jest.fn(),
         verify: jest.fn(),
       });
@@ -74,12 +74,11 @@ describe('EmailProvider', () => {
       process.env.SMTP_FROM_EMAIL = 'noreply@example.com';
       process.env.SMTP_FROM_NAME = 'Test Service';
 
-      const nodemailer = require('nodemailer');
       const mockSendMail = jest.fn().mockResolvedValue({
         messageId: 'email-123',
         accepted: ['test@example.com'],
       });
-      nodemailer.createTransport.mockReturnValue({
+      (nodemailer.createTransport as jest.Mock).mockReturnValue({
         sendMail: mockSendMail,
         verify: jest.fn(),
       });
@@ -109,9 +108,8 @@ describe('EmailProvider', () => {
       process.env.SMTP_FROM_EMAIL = 'noreply@example.com';
       process.env.SMTP_FROM_NAME = 'Test Service';
 
-      const nodemailer = require('nodemailer');
       const mockSendMail = jest.fn().mockRejectedValue(new Error('SMTP connection failed'));
-      nodemailer.createTransport.mockReturnValue({
+      (nodemailer.createTransport as jest.Mock).mockReturnValue({
         sendMail: mockSendMail,
         verify: jest.fn(),
       });

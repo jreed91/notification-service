@@ -1,7 +1,6 @@
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import { AuthRequest } from '../../middleware/auth';
 import * as notificationController from '../../controllers/notificationController';
-import { NotificationService } from '../../services/NotificationService';
 import { db } from '../../database/client';
 import { NotificationStatus } from '@notification-service/shared';
 

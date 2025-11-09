@@ -98,7 +98,7 @@ describe('NotificationService', () => {
       // Mock notification insert
       (db.query as jest.Mock).mockResolvedValue({ rows: [] });
 
-      const result = await service.sendNotification(mockTenantId, {
+      await service.sendNotification(mockTenantId, {
         userId: mockUserId,
         templateKey: mockTemplateKey,
         variables: {

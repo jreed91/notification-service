@@ -1,9 +1,11 @@
 import { FcmProvider } from '../../providers/FcmProvider';
 import { DeliveryChannel } from '@notification-service/shared';
+import * as admin from 'firebase-admin';
 
 // Mock the firebase-admin module
 jest.mock('firebase-admin', () => {
   return {
+    apps: [],
     initializeApp: jest.fn(),
     credential: {
       cert: jest.fn(),
@@ -39,10 +41,8 @@ describe('FcmProvider', () => {
       process.env.FCM_CLIENT_EMAIL = 'test@test.iam.gserviceaccount.com';
       process.env.FCM_PRIVATE_KEY = 'test-private-key';
 
-      const admin = require('firebase-admin');
-      admin.apps = []; // Start with no apps
-      admin.credential.cert.mockReturnValue({});
-      admin.initializeApp.mockReturnValue({});
+      (admin.credential.cert as jest.Mock).mockReturnValue({});
+      (admin.initializeApp as jest.Mock).mockReturnValue({});
 
       const provider = new FcmProvider();
       expect(provider.isConfigured()).toBe(true);
@@ -67,12 +67,10 @@ describe('FcmProvider', () => {
       process.env.FCM_CLIENT_EMAIL = 'test@test.iam.gserviceaccount.com';
       process.env.FCM_PRIVATE_KEY = 'test-private-key';
 
-      const admin = require('firebase-admin');
       const mockSend = jest.fn().mockResolvedValue('message-id-123');
-      admin.apps = []; // Start with no apps
-      admin.credential.cert.mockReturnValue({});
-      admin.initializeApp.mockReturnValue({});
-      admin.messaging.mockReturnValue({ send: mockSend });
+      (admin.credential.cert as jest.Mock).mockReturnValue({});
+      (admin.initializeApp as jest.Mock).mockReturnValue({});
+      (admin.messaging as jest.Mock).mockReturnValue({ send: mockSend });
 
       const provider = new FcmProvider();
       const result = await provider.send({
@@ -98,12 +96,10 @@ describe('FcmProvider', () => {
       process.env.FCM_CLIENT_EMAIL = 'test@test.iam.gserviceaccount.com';
       process.env.FCM_PRIVATE_KEY = 'test-private-key';
 
-      const admin = require('firebase-admin');
       const mockSend = jest.fn().mockRejectedValue(new Error('Network error'));
-      admin.apps = []; // Start with no apps
-      admin.credential.cert.mockReturnValue({});
-      admin.initializeApp.mockReturnValue({});
-      admin.messaging.mockReturnValue({ send: mockSend });
+      (admin.credential.cert as jest.Mock).mockReturnValue({});
+      (admin.initializeApp as jest.Mock).mockReturnValue({});
+      (admin.messaging as jest.Mock).mockReturnValue({ send: mockSend });
 
       const provider = new FcmProvider();
       const result = await provider.send({

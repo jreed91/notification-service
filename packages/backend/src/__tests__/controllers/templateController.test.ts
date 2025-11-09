@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import { AuthRequest } from '../../middleware/auth';
 import * as templateController from '../../controllers/templateController';
 import { db } from '../../database/client';

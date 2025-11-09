@@ -1,5 +1,6 @@
 import { SmsProvider } from '../../providers/SmsProvider';
 import { DeliveryChannel } from '@notification-service/shared';
+import twilio from 'twilio';
 
 // Mock the twilio module
 jest.mock('twilio', () => {
@@ -57,12 +58,11 @@ describe('SmsProvider', () => {
       process.env.TWILIO_AUTH_TOKEN = 'test-token';
       process.env.TWILIO_PHONE_NUMBER = '+1234567890';
 
-      const twilio = require('twilio');
       const mockCreate = jest.fn().mockResolvedValue({
         sid: 'sms-123',
         status: 'sent',
       });
-      twilio.mockReturnValue({
+      (twilio as unknown as jest.Mock).mockReturnValue({
         messages: { create: mockCreate },
       });
 
@@ -85,9 +85,8 @@ describe('SmsProvider', () => {
       process.env.TWILIO_AUTH_TOKEN = 'test-token';
       process.env.TWILIO_PHONE_NUMBER = '+1234567890';
 
-      const twilio = require('twilio');
       const mockCreate = jest.fn().mockRejectedValue(new Error('Invalid phone number'));
-      twilio.mockReturnValue({
+      (twilio as unknown as jest.Mock).mockReturnValue({
         messages: { create: mockCreate },
       });
 

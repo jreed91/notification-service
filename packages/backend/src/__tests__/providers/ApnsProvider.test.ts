@@ -1,5 +1,6 @@
 import { ApnsProvider } from '../../providers/ApnsProvider';
 import { DeliveryChannel } from '@notification-service/shared';
+import * as apn from 'apn';
 
 // Mock the apn module
 jest.mock('apn', () => {
@@ -34,8 +35,7 @@ describe('ApnsProvider', () => {
       process.env.APNS_TEAM_ID = 'test-team-id';
       process.env.APNS_KEY_PATH = '/path/to/key.p8';
 
-      const apn = require('apn');
-      apn.Provider.mockImplementation(() => ({}));
+      (apn.Provider as unknown as jest.Mock).mockImplementation(() => ({}));
 
       const provider = new ApnsProvider();
       expect(provider.isConfigured()).toBe(true);
