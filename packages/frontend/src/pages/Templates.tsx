@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { templateApi } from '../api/templates';
-import { Plus, Trash2, Edit } from 'lucide-react';
+import { Plus, Trash2, Edit, FileText } from 'lucide-react';
 import { DeliveryChannel } from '@notification-service/shared';
 
 export function Templates() {

@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { AuthRequest } from '../middleware/auth';
 import { NotificationService } from '../services/NotificationService';
 import { DeliveryChannel, SendNotificationRequest } from '@notification-service/shared';
+import { db } from '../database/client';
 
 const notificationService = new NotificationService();
 

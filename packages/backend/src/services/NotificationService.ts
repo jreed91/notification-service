@@ -185,13 +185,13 @@ export class NotificationService {
       let recipient: string | undefined;
       switch (channel) {
         case DeliveryChannel.APPLE_PUSH:
-          recipient = user.apns_device_token;
+          recipient = user.apnsDeviceToken;
           break;
         case DeliveryChannel.GOOGLE_PUSH:
-          recipient = user.fcm_device_token;
+          recipient = user.fcmDeviceToken;
           break;
         case DeliveryChannel.SMS:
-          recipient = user.phone_number;
+          recipient = user.phoneNumber;
           break;
         case DeliveryChannel.EMAIL:
           recipient = user.email;
