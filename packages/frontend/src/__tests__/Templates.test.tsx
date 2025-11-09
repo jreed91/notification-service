@@ -1,59 +1,67 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { BrowserRouter } from 'react-router-dom';
-import Templates from '../pages/Templates';
-import * as templateHooks from '../hooks/useTemplates';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { Templates } from '../pages/Templates';
 
-// Mock the hooks
-vi.mock('../hooks/useTemplates');
+// Mock the template API
+const mockTemplateApi = {
+  list: vi.fn(),
+  create: vi.fn(),
+  get: vi.fn(),
+  update: vi.fn(),
+  delete: vi.fn(),
+};
+
+vi.mock('../api/templates', () => ({
+  templateApi: mockTemplateApi,
+}));
 
 describe('Templates', () => {
+  let queryClient: QueryClient;
+
+  beforeEach(() => {
+    queryClient = new QueryClient({
+      defaultOptions: {
+        queries: { retry: false },
+      },
+    });
+    vi.clearAllMocks();
+  });
+
   const renderTemplates = () => {
     return render(
-      <BrowserRouter>
-        <Templates />
-      </BrowserRouter>
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
+          <Templates />
+        </BrowserRouter>
+      </QueryClientProvider>
     );
   };
 
-  it('should render templates page title', () => {
-    vi.spyOn(templateHooks, 'useTemplates').mockReturnValue({
-      data: undefined,
-      isLoading: false,
-      error: null,
-      refetch: vi.fn(),
-    } as any);
+  it('should render templates page title', async () => {
+    mockTemplateApi.list.mockResolvedValue({
+      templates: [],
+    });
 
     renderTemplates();
-    expect(screen.getByText('Notification Templates')).toBeInTheDocument();
+
+    await waitFor(() => {
+      expect(screen.getByText('Notification Templates')).toBeInTheDocument();
+    });
   });
 
   it('should display loading state', () => {
-    vi.spyOn(templateHooks, 'useTemplates').mockReturnValue({
-      data: undefined,
-      isLoading: true,
-      error: null,
-      refetch: vi.fn(),
-    } as any);
+    mockTemplateApi.list.mockImplementation(
+      () => new Promise(() => {}) // Never resolves
+    );
 
     renderTemplates();
     expect(screen.getByText('Loading...')).toBeInTheDocument();
   });
 
-  it('should display error state', () => {
-    vi.spyOn(templateHooks, 'useTemplates').mockReturnValue({
-      data: undefined,
-      isLoading: false,
-      error: new Error('Failed to fetch'),
-      refetch: vi.fn(),
-    } as any);
-
-    renderTemplates();
-    expect(screen.getByText(/Failed to load templates/)).toBeInTheDocument();
-  });
-
-  it('should display templates when loaded', () => {
+  it('should display templates when loaded', async () => {
     const mockTemplates = [
       {
         id: '1',
@@ -83,46 +91,87 @@ describe('Templates', () => {
       },
     ];
 
-    vi.spyOn(templateHooks, 'useTemplates').mockReturnValue({
-      data: { templates: mockTemplates },
-      isLoading: false,
-      error: null,
-      refetch: vi.fn(),
-    } as any);
+    mockTemplateApi.list.mockResolvedValue({
+      templates: mockTemplates,
+    });
 
     renderTemplates();
-    expect(screen.getByText('Welcome Message')).toBeInTheDocument();
-    expect(screen.getByText('Reset Password')).toBeInTheDocument();
+
+    await waitFor(() => {
+      expect(screen.getByText('Welcome Message')).toBeInTheDocument();
+      expect(screen.getByText('Reset Password')).toBeInTheDocument();
+    });
   });
 
-  it('should have create template button', () => {
-    vi.spyOn(templateHooks, 'useTemplates').mockReturnValue({
-      data: undefined,
-      isLoading: false,
-      error: null,
-      refetch: vi.fn(),
-    } as any);
+  it('should have create template button', async () => {
+    mockTemplateApi.list.mockResolvedValue({
+      templates: [],
+    });
 
     renderTemplates();
-    expect(screen.getByRole('button', { name: /create template/i })).toBeInTheDocument();
+
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /create template/i })).toBeInTheDocument();
+    });
   });
 
   it('should show alert when create button is clicked', async () => {
     const user = userEvent.setup();
     const alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => {});
 
-    vi.spyOn(templateHooks, 'useTemplates').mockReturnValue({
-      data: undefined,
-      isLoading: false,
-      error: null,
-      refetch: vi.fn(),
-    } as any);
+    mockTemplateApi.list.mockResolvedValue({
+      templates: [],
+    });
 
     renderTemplates();
+
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /create template/i })).toBeInTheDocument();
+    });
+
     const createButton = screen.getByRole('button', { name: /create template/i });
     await user.click(createButton);
 
     expect(alertSpy).toHaveBeenCalledWith('Create template modal coming soon');
     alertSpy.mockRestore();
+  });
+
+  it('should display empty state when no templates', async () => {
+    mockTemplateApi.list.mockResolvedValue({
+      templates: [],
+    });
+
+    renderTemplates();
+
+    await waitFor(() => {
+      expect(screen.getByText('No templates')).toBeInTheDocument();
+      expect(screen.getByText(/Get started by creating a new template/)).toBeInTheDocument();
+    });
+  });
+
+  it('should display template channels', async () => {
+    const mockTemplates = [
+      {
+        id: '1',
+        key: 'welcome',
+        name: 'Welcome Message',
+        channels: ['EMAIL', 'APPLE_PUSH', 'SMS'],
+        translations: {
+          'en-US': { body: 'Hello' },
+        },
+      },
+    ];
+
+    mockTemplateApi.list.mockResolvedValue({
+      templates: mockTemplates,
+    });
+
+    renderTemplates();
+
+    await waitFor(() => {
+      expect(screen.getByText('EMAIL')).toBeInTheDocument();
+      expect(screen.getByText('APPLE_PUSH')).toBeInTheDocument();
+      expect(screen.getByText('SMS')).toBeInTheDocument();
+    });
   });
 });

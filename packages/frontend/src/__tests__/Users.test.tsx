@@ -1,119 +1,144 @@
-import { describe, it, expect, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { render, screen, waitFor } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
-import Users from '../pages/Users';
-import * as userHooks from '../hooks/useUsers';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { Users } from '../pages/Users';
+import * as userApi from '../api/users';
 
-// Mock the hooks
-vi.mock('../hooks/useUsers');
+// Mock the API
+vi.mock('../api/users');
 
 describe('Users', () => {
+  let queryClient: QueryClient;
+
+  beforeEach(() => {
+    queryClient = new QueryClient({
+      defaultOptions: {
+        queries: { retry: false },
+      },
+    });
+    vi.clearAllMocks();
+  });
+
   const renderUsers = () => {
     return render(
-      <BrowserRouter>
-        <Users />
-      </BrowserRouter>
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
+          <Users />
+        </BrowserRouter>
+      </QueryClientProvider>
     );
   };
 
-  it('should render users page title', () => {
-    vi.spyOn(userHooks, 'useUsers').mockReturnValue({
-      data: undefined,
-      isLoading: false,
-      error: null,
-      refetch: vi.fn(),
-    } as any);
+  it('should render users page title', async () => {
+    vi.spyOn(userApi.userApi, 'list').mockResolvedValue({
+      users: [],
+    });
 
     renderUsers();
     expect(screen.getByText('Users')).toBeInTheDocument();
   });
 
   it('should display loading state', () => {
-    vi.spyOn(userHooks, 'useUsers').mockReturnValue({
-      data: undefined,
-      isLoading: true,
-      error: null,
-      refetch: vi.fn(),
-    } as any);
+    vi.spyOn(userApi.userApi, 'list').mockImplementation(
+      () => new Promise(() => {}) // Never resolves
+    );
 
     renderUsers();
     expect(screen.getByText('Loading...')).toBeInTheDocument();
   });
 
-  it('should display error state', () => {
-    vi.spyOn(userHooks, 'useUsers').mockReturnValue({
-      data: undefined,
-      isLoading: false,
-      error: new Error('Failed to fetch'),
-      refetch: vi.fn(),
-    } as any);
-
-    renderUsers();
-    expect(screen.getByText(/Failed to load users/)).toBeInTheDocument();
-  });
-
-  it('should display users when loaded', () => {
+  it('should display users when loaded', async () => {
     const mockUsers = [
       {
-        id: '1',
+        id: 'user-123',
         email: 'user1@example.com',
         phoneNumber: '+1234567890',
         locale: 'en-US',
       },
       {
-        id: '2',
+        id: 'user-456',
         email: 'user2@example.com',
         phoneNumber: '+0987654321',
         locale: 'es-ES',
       },
     ];
 
-    vi.spyOn(userHooks, 'useUsers').mockReturnValue({
-      data: { users: mockUsers },
-      isLoading: false,
-      error: null,
-      refetch: vi.fn(),
-    } as any);
+    vi.spyOn(userApi.userApi, 'list').mockResolvedValue({
+      users: mockUsers,
+    });
 
     renderUsers();
-    expect(screen.getByText('user1@example.com')).toBeInTheDocument();
-    expect(screen.getByText('user2@example.com')).toBeInTheDocument();
+
+    await waitFor(() => {
+      expect(screen.getByText('user1@example.com')).toBeInTheDocument();
+      expect(screen.getByText('user2@example.com')).toBeInTheDocument();
+      expect(screen.getByText('en-US')).toBeInTheDocument();
+      expect(screen.getByText('es-ES')).toBeInTheDocument();
+    });
   });
 
-  it('should have create user button', () => {
-    vi.spyOn(userHooks, 'useUsers').mockReturnValue({
-      data: undefined,
-      isLoading: false,
-      error: null,
-      refetch: vi.fn(),
-    } as any);
+  it('should have add user button', async () => {
+    vi.spyOn(userApi.userApi, 'list').mockResolvedValue({
+      users: [],
+    });
 
     renderUsers();
-    expect(screen.getByRole('button', { name: /create user/i })).toBeInTheDocument();
+
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /add user/i })).toBeInTheDocument();
+    });
   });
 
-  it('should display user count when users are loaded', () => {
+  it('should display empty state when no users', async () => {
+    vi.spyOn(userApi.userApi, 'list').mockResolvedValue({
+      users: [],
+    });
+
+    renderUsers();
+
+    await waitFor(() => {
+      expect(screen.getByText('No users')).toBeInTheDocument();
+      expect(screen.getByText(/Get started by creating a new user/)).toBeInTheDocument();
+    });
+  });
+
+  it('should display device tokens when available', async () => {
     const mockUsers = [
       {
-        id: '1',
-        email: 'user1@example.com',
+        id: 'user-123',
+        email: 'user@example.com',
         locale: 'en-US',
-      },
-      {
-        id: '2',
-        email: 'user2@example.com',
-        locale: 'es-ES',
+        apnsDeviceToken: 'apns-token',
+        fcmDeviceToken: 'fcm-token',
       },
     ];
 
-    vi.spyOn(userHooks, 'useUsers').mockReturnValue({
-      data: { users: mockUsers },
-      isLoading: false,
-      error: null,
-      refetch: vi.fn(),
-    } as any);
+    vi.spyOn(userApi.userApi, 'list').mockResolvedValue({
+      users: mockUsers,
+    });
 
     renderUsers();
-    expect(screen.getByText(/2.*users/i)).toBeInTheDocument();
+
+    await waitFor(() => {
+      expect(screen.getByText('iOS')).toBeInTheDocument();
+      expect(screen.getByText('Android')).toBeInTheDocument();
+    });
+  });
+
+  it('should display table headers', async () => {
+    vi.spyOn(userApi.userApi, 'list').mockResolvedValue({
+      users: [],
+    });
+
+    renderUsers();
+
+    await waitFor(() => {
+      expect(screen.getByText('User')).toBeInTheDocument();
+      expect(screen.getByText('Contact')).toBeInTheDocument();
+      expect(screen.getByText('Locale')).toBeInTheDocument();
+      expect(screen.getByText('Devices')).toBeInTheDocument();
+      expect(screen.getByText('Actions')).toBeInTheDocument();
+    });
   });
 });

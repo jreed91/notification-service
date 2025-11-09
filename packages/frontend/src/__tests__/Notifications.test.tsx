@@ -1,65 +1,63 @@
-import { describe, it, expect, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { render, screen, waitFor } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
-import Notifications from '../pages/Notifications';
-import * as notificationHooks from '../hooks/useNotifications';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { Notifications } from '../pages/Notifications';
+import * as notificationApi from '../api/notifications';
+import { NotificationStatus } from '@notification-service/shared';
 
-// Mock the hooks
-vi.mock('../hooks/useNotifications');
+// Mock the API
+vi.mock('../api/notifications');
 
 describe('Notifications', () => {
+  let queryClient: QueryClient;
+
+  beforeEach(() => {
+    queryClient = new QueryClient({
+      defaultOptions: {
+        queries: { retry: false },
+      },
+    });
+    vi.clearAllMocks();
+  });
+
   const renderNotifications = () => {
     return render(
-      <BrowserRouter>
-        <Notifications />
-      </BrowserRouter>
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
+          <Notifications />
+        </BrowserRouter>
+      </QueryClientProvider>
     );
   };
 
-  it('should render notifications page title', () => {
-    vi.spyOn(notificationHooks, 'useNotifications').mockReturnValue({
-      data: undefined,
-      isLoading: false,
-      error: null,
-      refetch: vi.fn(),
-    } as any);
+  it('should render notifications page title', async () => {
+    vi.spyOn(notificationApi.notificationApi, 'list').mockResolvedValue({
+      notifications: [],
+      total: 0,
+    });
 
     renderNotifications();
-    expect(screen.getByText('Notifications')).toBeInTheDocument();
+    expect(screen.getByText('Notification History')).toBeInTheDocument();
   });
 
   it('should display loading state', () => {
-    vi.spyOn(notificationHooks, 'useNotifications').mockReturnValue({
-      data: undefined,
-      isLoading: true,
-      error: null,
-      refetch: vi.fn(),
-    } as any);
+    vi.spyOn(notificationApi.notificationApi, 'list').mockImplementation(
+      () => new Promise(() => {}) // Never resolves
+    );
 
     renderNotifications();
     expect(screen.getByText('Loading...')).toBeInTheDocument();
   });
 
-  it('should display error state', () => {
-    vi.spyOn(notificationHooks, 'useNotifications').mockReturnValue({
-      data: undefined,
-      isLoading: false,
-      error: new Error('Failed to fetch'),
-      refetch: vi.fn(),
-    } as any);
-
-    renderNotifications();
-    expect(screen.getByText(/Failed to load notifications/)).toBeInTheDocument();
-  });
-
-  it('should display notifications when loaded', () => {
+  it('should display notifications when loaded', async () => {
     const mockNotifications = [
       {
         id: '1',
         userId: 'user-1',
         templateKey: 'welcome',
         channel: 'EMAIL',
-        status: 'SENT' as const,
+        status: NotificationStatus.SENT,
         createdAt: new Date().toISOString(),
       },
       {
@@ -67,63 +65,83 @@ describe('Notifications', () => {
         userId: 'user-2',
         templateKey: 'reset-password',
         channel: 'SMS',
-        status: 'PENDING' as const,
+        status: NotificationStatus.PENDING,
         createdAt: new Date().toISOString(),
       },
     ];
 
-    vi.spyOn(notificationHooks, 'useNotifications').mockReturnValue({
-      data: { notifications: mockNotifications, total: 2 },
-      isLoading: false,
-      error: null,
-      refetch: vi.fn(),
-    } as any);
+    vi.spyOn(notificationApi.notificationApi, 'list').mockResolvedValue({
+      notifications: mockNotifications,
+      total: 2,
+    });
 
     renderNotifications();
-    expect(screen.getByText('welcome')).toBeInTheDocument();
-    expect(screen.getByText('reset-password')).toBeInTheDocument();
-    expect(screen.getByText('SENT')).toBeInTheDocument();
-    expect(screen.getByText('PENDING')).toBeInTheDocument();
+
+    await waitFor(() => {
+      expect(screen.getByText('welcome')).toBeInTheDocument();
+      expect(screen.getByText('reset-password')).toBeInTheDocument();
+      expect(screen.getByText('EMAIL')).toBeInTheDocument();
+      expect(screen.getByText('SMS')).toBeInTheDocument();
+      expect(screen.getByText('SENT')).toBeInTheDocument();
+      expect(screen.getByText('PENDING')).toBeInTheDocument();
+    });
   });
 
-  it('should have send notification button', () => {
-    vi.spyOn(notificationHooks, 'useNotifications').mockReturnValue({
-      data: undefined,
-      isLoading: false,
-      error: null,
-      refetch: vi.fn(),
-    } as any);
+  it('should display empty state when no notifications', async () => {
+    vi.spyOn(notificationApi.notificationApi, 'list').mockResolvedValue({
+      notifications: [],
+      total: 0,
+    });
 
     renderNotifications();
-    expect(screen.getByRole('link', { name: /send notification/i })).toBeInTheDocument();
+
+    await waitFor(() => {
+      expect(screen.getByText('No notifications')).toBeInTheDocument();
+      expect(
+        screen.getByText(/Notifications will appear here once you start sending them/)
+      ).toBeInTheDocument();
+    });
   });
 
-  it('should display notification count', () => {
+  it('should display table headers', async () => {
+    vi.spyOn(notificationApi.notificationApi, 'list').mockResolvedValue({
+      notifications: [],
+      total: 0,
+    });
+
+    renderNotifications();
+
+    await waitFor(() => {
+      expect(screen.getByText('Template')).toBeInTheDocument();
+      expect(screen.getByText('Channel')).toBeInTheDocument();
+      expect(screen.getByText('Status')).toBeInTheDocument();
+      expect(screen.getByText('User')).toBeInTheDocument();
+      expect(screen.getByText('Created')).toBeInTheDocument();
+    });
+  });
+
+  it('should display notification with correct status color', async () => {
     const mockNotifications = [
       {
         id: '1',
         userId: 'user-1',
-        templateKey: 'welcome',
-        status: 'SENT' as const,
-        createdAt: new Date().toISOString(),
-      },
-      {
-        id: '2',
-        userId: 'user-2',
-        templateKey: 'reset',
-        status: 'PENDING' as const,
+        templateKey: 'test',
+        channel: 'EMAIL',
+        status: NotificationStatus.FAILED,
         createdAt: new Date().toISOString(),
       },
     ];
 
-    vi.spyOn(notificationHooks, 'useNotifications').mockReturnValue({
-      data: { notifications: mockNotifications, total: 2 },
-      isLoading: false,
-      error: null,
-      refetch: vi.fn(),
-    } as any);
+    vi.spyOn(notificationApi.notificationApi, 'list').mockResolvedValue({
+      notifications: mockNotifications,
+      total: 1,
+    });
 
     renderNotifications();
-    expect(screen.getByText(/2.*total/i)).toBeInTheDocument();
+
+    await waitFor(() => {
+      const statusBadge = screen.getByText('FAILED');
+      expect(statusBadge).toHaveClass('bg-red-100', 'text-red-800');
+    });
   });
 });

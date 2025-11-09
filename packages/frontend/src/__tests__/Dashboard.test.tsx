@@ -1,11 +1,7 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
-import Dashboard from '../pages/Dashboard';
-import * as notificationHooks from '../hooks/useNotifications';
-
-// Mock the hooks
-vi.mock('../hooks/useNotifications');
+import { Dashboard } from '../pages/Dashboard';
 
 describe('Dashboard', () => {
   const renderDashboard = () => {
@@ -17,82 +13,44 @@ describe('Dashboard', () => {
   };
 
   it('should render dashboard title', () => {
-    vi.spyOn(notificationHooks, 'useNotifications').mockReturnValue({
-      data: undefined,
-      isLoading: false,
-      error: null,
-      refetch: vi.fn(),
-    } as any);
-
     renderDashboard();
     expect(screen.getByText('Dashboard')).toBeInTheDocument();
   });
 
-  it('should display loading state', () => {
-    vi.spyOn(notificationHooks, 'useNotifications').mockReturnValue({
-      data: undefined,
-      isLoading: true,
-      error: null,
-      refetch: vi.fn(),
-    } as any);
-
+  it('should render description', () => {
     renderDashboard();
-    expect(screen.getByText('Loading...')).toBeInTheDocument();
+    expect(
+      screen.getByText(/Multi-tenant notification service/)
+    ).toBeInTheDocument();
   });
 
-  it('should display error state', () => {
-    vi.spyOn(notificationHooks, 'useNotifications').mockReturnValue({
-      data: undefined,
-      isLoading: false,
-      error: new Error('Failed to fetch'),
-      refetch: vi.fn(),
-    } as any);
-
+  it('should display navigation cards', () => {
     renderDashboard();
-    expect(screen.getByText(/Failed to load notifications/)).toBeInTheDocument();
+    expect(screen.getByText('Templates')).toBeInTheDocument();
+    expect(screen.getByText('Users')).toBeInTheDocument();
+    expect(screen.getByText('Notifications')).toBeInTheDocument();
+    expect(screen.getByText('Send')).toBeInTheDocument();
   });
 
-  it('should display notifications when loaded', () => {
-    const mockNotifications = [
-      {
-        id: '1',
-        userId: 'user-1',
-        templateKey: 'welcome',
-        status: 'SENT' as const,
-        createdAt: new Date().toISOString(),
-      },
-      {
-        id: '2',
-        userId: 'user-2',
-        templateKey: 'reset-password',
-        status: 'PENDING' as const,
-        createdAt: new Date().toISOString(),
-      },
-    ];
-
-    vi.spyOn(notificationHooks, 'useNotifications').mockReturnValue({
-      data: { notifications: mockNotifications, total: 2 },
-      isLoading: false,
-      error: null,
-      refetch: vi.fn(),
-    } as any);
-
+  it('should have correct links', () => {
     renderDashboard();
-    expect(screen.getByText('welcome')).toBeInTheDocument();
-    expect(screen.getByText('reset-password')).toBeInTheDocument();
+
+    const templatesLink = screen.getByRole('link', { name: /templates/i });
+    expect(templatesLink).toHaveAttribute('href', '/templates');
+
+    const usersLink = screen.getByRole('link', { name: /users/i });
+    expect(usersLink).toHaveAttribute('href', '/users');
+
+    const notificationsLink = screen.getByRole('link', { name: /notifications/i });
+    expect(notificationsLink).toHaveAttribute('href', '/notifications');
   });
 
-  it('should display navigation links', () => {
-    vi.spyOn(notificationHooks, 'useNotifications').mockReturnValue({
-      data: undefined,
-      isLoading: false,
-      error: null,
-      refetch: vi.fn(),
-    } as any);
-
+  it('should display features list', () => {
     renderDashboard();
-    expect(screen.getByRole('link', { name: /templates/i })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /users/i })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /notifications/i })).toBeInTheDocument();
+    expect(screen.getByText(/Multi-channel notifications/)).toBeInTheDocument();
+    expect(screen.getByText(/Template-based messages/)).toBeInTheDocument();
+    expect(screen.getByText(/Multi-language support/)).toBeInTheDocument();
+    expect(screen.getByText(/Subscription management/)).toBeInTheDocument();
+    expect(screen.getByText(/Multi-tenant architecture/)).toBeInTheDocument();
   });
 });
