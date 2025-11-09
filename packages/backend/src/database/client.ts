@@ -1,5 +1,7 @@
 import { Pool, PoolClient, QueryResult, QueryResultRow } from 'pg';
+import { drizzle } from 'drizzle-orm/node-postgres';
 import dotenv from 'dotenv';
+import * as schema from './schema';
 
 dotenv.config();
 
@@ -50,6 +52,14 @@ class Database {
   async end(): Promise<void> {
     await this.pool.end();
   }
+
+  getPool(): Pool {
+    return this.pool;
+  }
 }
 
-export const db = new Database();
+const database = new Database();
+
+// Export both legacy and Drizzle clients
+export const db = database;
+export const drizzleDb = drizzle(database.getPool(), { schema });

@@ -1,14 +1,24 @@
+import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { templateApi } from '../api/templates';
 import { Plus, Trash2, Edit, FileText } from 'lucide-react';
 import { DeliveryChannel } from '@notification-service/shared';
+import { CreateTemplateModal } from '../components/CreateTemplateModal';
 
 export function Templates() {
   const queryClient = useQueryClient();
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
   const { data, isLoading } = useQuery({
     queryKey: ['templates'],
     queryFn: () => templateApi.list(),
+  });
+
+  const createMutation = useMutation({
+    mutationFn: (data: any) => templateApi.create(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['templates'] });
+    },
   });
 
   const deleteMutation = useMutation({
@@ -27,13 +37,19 @@ export function Templates() {
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold text-gray-900">Notification Templates</h1>
         <button
-          onClick={() => alert('Create template modal coming soon')}
+          onClick={() => setIsCreateModalOpen(true)}
           className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
         >
           <Plus className="h-4 w-4" />
           <span>Create Template</span>
         </button>
       </div>
+
+      <CreateTemplateModal
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        onSubmit={createMutation.mutateAsync}
+      />
 
       <div className="grid gap-6">
         {data?.templates.map((template) => (

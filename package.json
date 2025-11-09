@@ -14,6 +14,10 @@
     "lint": "turbo run lint",
     "backend:dev": "turbo run dev --filter=@notification-service/backend",
     "frontend:dev": "turbo run dev --filter=@notification-service/frontend",
+    "db:up": "docker compose up -d",
+    "db:down": "docker compose down",
+    "db:migrate": "npm run migrate -w packages/backend",
+    "db:studio": "npm run db:studio -w packages/backend",
     "clean": "turbo run clean && rm -rf node_modules"
   },
   "keywords": [
