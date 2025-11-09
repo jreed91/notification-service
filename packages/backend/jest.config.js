@@ -15,5 +15,6 @@ module.exports = {
   coverageReporters: ['text', 'lcov', 'html'],
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
+    '^@notification-service/shared$': '<rootDir>/../shared/src/index.ts',
   },
 };
