@@ -18,7 +18,7 @@ A comprehensive multi-tenant notification service built as a TypeScript monorepo
 
 ## Architecture
 
-This is a monorepo with three main packages:
+This is a monorepo managed by **Turborepo** with three main packages:
 
 ```
 notification-service/
@@ -26,7 +26,15 @@ notification-service/
 │   ├── shared/          # Shared types and utilities
 │   ├── backend/         # Node.js/Express API server
 │   └── frontend/        # React/Vite dashboard
+├── turbo.json          # Turborepo configuration
+└── package.json        # Monorepo root configuration
 ```
+
+**Benefits of Turborepo:**
+- Intelligent build caching (10-100x faster rebuilds)
+- Parallel task execution across packages
+- Automatic dependency graph resolution
+- Remote caching support (optional)
 
 ### Technology Stack
 
@@ -48,6 +56,11 @@ notification-service/
 - React Router
 - TanStack Query
 - Zustand (state management)
+
+**Build System:**
+- Turborepo for monorepo management
+- npm workspaces for package linking
+- TypeScript project references
 
 ## Getting Started
 

@@ -3,16 +3,18 @@
   "version": "1.0.0",
   "private": true,
   "description": "Multi-tenant notification service supporting Apple/Google push notifications, SMS, and Email",
+  "packageManager": "npm@10.2.4",
   "workspaces": [
     "packages/*"
   ],
   "scripts": {
-    "dev": "npm run dev --workspaces --if-present",
-    "build": "npm run build --workspaces --if-present",
-    "test": "npm run test --workspaces --if-present",
-    "lint": "npm run lint --workspaces --if-present",
-    "backend:dev": "npm run dev -w packages/backend",
-    "frontend:dev": "npm run dev -w packages/frontend"
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "test": "turbo run test",
+    "lint": "turbo run lint",
+    "backend:dev": "turbo run dev --filter=@notification-service/backend",
+    "frontend:dev": "turbo run dev --filter=@notification-service/frontend",
+    "clean": "turbo run clean && rm -rf node_modules"
   },
   "keywords": [
     "notifications",
@@ -29,6 +31,7 @@
     "@typescript-eslint/eslint-plugin": "^6.14.0",
     "@typescript-eslint/parser": "^6.14.0",
     "eslint": "^8.57.1",
+    "turbo": "^2.6.0",
     "typescript": "^5.3.3"
   }
 }

@@ -42,36 +42,18 @@ jobs:
     - name: Install dependencies
       run: npm ci
 
-    - name: Lint shared package
-      run: npm run lint -w packages/shared --if-present
+    - name: Lint all packages
+      run: npm run lint
 
-    - name: Lint backend
-      run: npm run lint -w packages/backend --if-present
+    - name: Build all packages
+      run: npm run build
 
-    - name: Lint frontend
-      run: npm run lint -w packages/frontend --if-present
-
-    - name: Build shared package
-      run: npm run build -w packages/shared
-
-    - name: Build backend
-      run: npm run build -w packages/backend
-
-    - name: Build frontend
-      run: npm run build -w packages/frontend
-
-    - name: Run backend tests
-      run: npm run test -w packages/backend --if-present
+    - name: Run all tests
+      run: npm run test
       env:
         DATABASE_URL: postgresql://postgres:postgres@localhost:5432/notification_service_test
         NODE_ENV: test
         JWT_SECRET: test-secret
-
-    - name: Run frontend tests
-      run: npm run test -w packages/frontend --if-present
-
-    - name: Type check
-      run: npm run type-check --if-present
 
   docker-build:
     runs-on: ubuntu-latest
