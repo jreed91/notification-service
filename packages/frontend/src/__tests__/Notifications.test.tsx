@@ -4,7 +4,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Notifications } from '../pages/Notifications';
 import * as notificationApi from '../api/notifications';
-import { NotificationStatus } from '@notification-service/shared';
+import { NotificationStatus, DeliveryChannel } from '@notification-service/shared';
 
 // Mock the API
 vi.mock('../api/notifications');
@@ -59,17 +59,21 @@ describe('Notifications', () => {
         id: '1',
         userId: 'user-1',
         templateKey: 'welcome',
-        channel: 'EMAIL',
+        channel: DeliveryChannel.EMAIL,
         status: NotificationStatus.SENT,
-        createdAt: new Date().toISOString(),
+        tenantId: 'tenant-1',
+        createdAt: new Date(),
+        updatedAt: new Date(),
       },
       {
         id: '2',
         userId: 'user-2',
         templateKey: 'reset-password',
-        channel: 'SMS',
+        channel: DeliveryChannel.SMS,
         status: NotificationStatus.PENDING,
-        createdAt: new Date().toISOString(),
+        tenantId: 'tenant-1',
+        createdAt: new Date(),
+        updatedAt: new Date(),
       },
     ];
 
@@ -129,9 +133,11 @@ describe('Notifications', () => {
         id: '1',
         userId: 'user-1',
         templateKey: 'test',
-        channel: 'EMAIL',
+        channel: DeliveryChannel.EMAIL,
         status: NotificationStatus.FAILED,
-        createdAt: new Date().toISOString(),
+        tenantId: 'tenant-1',
+        createdAt: new Date(),
+        updatedAt: new Date(),
       },
     ];
 

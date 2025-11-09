@@ -5,6 +5,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Templates } from '../pages/Templates';
 import * as templateApi from '../api/templates';
+import { DeliveryChannel } from '@notification-service/shared';
 
 // Mock the template API
 vi.mock('../api/templates');
@@ -59,26 +60,32 @@ describe('Templates', () => {
         key: 'welcome',
         name: 'Welcome Message',
         description: 'Sent when user signs up',
-        channels: ['EMAIL', 'APPLE_PUSH'],
+        channels: [DeliveryChannel.EMAIL, DeliveryChannel.APPLE_PUSH],
         translations: {
           'en-US': {
             subject: 'Welcome!',
             body: 'Hello {{name}}',
           },
         },
+        tenantId: 'tenant-1',
+        createdAt: new Date(),
+        updatedAt: new Date(),
       },
       {
         id: '2',
         key: 'reset-password',
         name: 'Reset Password',
         description: 'Password reset email',
-        channels: ['EMAIL'],
+        channels: [DeliveryChannel.EMAIL],
         translations: {
           'en-US': {
             subject: 'Reset your password',
             body: 'Click here to reset',
           },
         },
+        tenantId: 'tenant-1',
+        createdAt: new Date(),
+        updatedAt: new Date(),
       },
     ];
 
@@ -146,10 +153,13 @@ describe('Templates', () => {
         id: '1',
         key: 'welcome',
         name: 'Welcome Message',
-        channels: ['EMAIL', 'APPLE_PUSH', 'SMS'],
+        channels: [DeliveryChannel.EMAIL, DeliveryChannel.APPLE_PUSH, DeliveryChannel.SMS],
         translations: {
           'en-US': { body: 'Hello' },
         },
+        tenantId: 'tenant-1',
+        createdAt: new Date(),
+        updatedAt: new Date(),
       },
     ];
 

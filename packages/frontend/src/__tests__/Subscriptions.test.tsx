@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Subscriptions } from '../pages/Subscriptions';
 import * as subscriptionApi from '../api/subscriptions';
 import * as templateApi from '../api/templates';
+import { DeliveryChannel } from '@notification-service/shared';
 
 // Mock the APIs
 vi.mock('../api/subscriptions');
@@ -70,15 +71,23 @@ describe('Subscriptions', () => {
         id: '1',
         key: 'welcome',
         name: 'Welcome Message',
-        channels: ['EMAIL', 'SMS'],
+        channels: [DeliveryChannel.EMAIL, DeliveryChannel.SMS],
         translations: { 'en-US': { body: 'Hello' } },
+        tenantId: 'tenant-1',
+        createdAt: new Date(),
+        updatedAt: new Date(),
       },
     ];
 
     const mockSubscriptions = [
       {
+        id: 'sub-1',
+        userId: 'user-123',
         templateKey: 'welcome',
         channels: { EMAIL: true, SMS: false },
+        tenantId: 'tenant-1',
+        createdAt: new Date(),
+        updatedAt: new Date(),
       },
     ];
 
@@ -104,8 +113,11 @@ describe('Subscriptions', () => {
         id: '1',
         key: 'welcome',
         name: 'Welcome',
-        channels: ['EMAIL'],
+        channels: [DeliveryChannel.EMAIL],
         translations: { 'en-US': { body: 'Test' } },
+        tenantId: 'tenant-1',
+        createdAt: new Date(),
+        updatedAt: new Date(),
       },
     ];
 

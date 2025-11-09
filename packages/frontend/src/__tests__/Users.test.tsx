@@ -58,12 +58,18 @@ describe('Users', () => {
         email: 'user1@example.com',
         phoneNumber: '+1234567890',
         locale: 'en-US',
+        tenantId: 'tenant-1',
+        createdAt: new Date(),
+        updatedAt: new Date(),
       },
       {
         id: 'user-456',
         email: 'user2@example.com',
         phoneNumber: '+0987654321',
         locale: 'es-ES',
+        tenantId: 'tenant-1',
+        createdAt: new Date(),
+        updatedAt: new Date(),
       },
     ];
 
@@ -114,6 +120,9 @@ describe('Users', () => {
         locale: 'en-US',
         apnsDeviceToken: 'apns-token',
         fcmDeviceToken: 'fcm-token',
+        tenantId: 'tenant-1',
+        createdAt: new Date(),
+        updatedAt: new Date(),
       },
     ];
 

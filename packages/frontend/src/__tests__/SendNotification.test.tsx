@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { SendNotification } from '../pages/SendNotification';
 import * as templateApi from '../api/templates';
 import * as userApi from '../api/users';
+import { DeliveryChannel } from '@notification-service/shared';
 
 // Mock the APIs
 vi.mock('../api/templates');
@@ -57,8 +58,11 @@ describe('SendNotification', () => {
         id: '1',
         key: 'welcome',
         name: 'Welcome Message',
-        channels: ['EMAIL'],
+        channels: [DeliveryChannel.EMAIL],
         translations: { 'en-US': { body: 'Hello' } },
+        tenantId: 'tenant-1',
+        createdAt: new Date(),
+        updatedAt: new Date(),
       },
     ];
 
@@ -81,6 +85,9 @@ describe('SendNotification', () => {
         id: 'user-123',
         email: 'test@example.com',
         locale: 'en-US',
+        tenantId: 'tenant-1',
+        createdAt: new Date(),
+        updatedAt: new Date(),
       },
     ];
 
@@ -126,8 +133,11 @@ describe('SendNotification', () => {
         id: '1',
         key: 'welcome',
         name: 'Welcome',
-        channels: ['EMAIL', 'SMS', 'APPLE_PUSH'],
+        channels: [DeliveryChannel.EMAIL, DeliveryChannel.SMS, DeliveryChannel.APPLE_PUSH],
         translations: { 'en-US': { body: 'Test' } },
+        tenantId: 'tenant-1',
+        createdAt: new Date(),
+        updatedAt: new Date(),
       },
     ];
 
@@ -164,8 +174,11 @@ describe('SendNotification', () => {
         id: '1',
         key: 'welcome',
         name: 'Welcome',
-        channels: ['EMAIL'],
+        channels: [DeliveryChannel.EMAIL],
         translations: { 'en-US': { body: 'Test' } },
+        tenantId: 'tenant-1',
+        createdAt: new Date(),
+        updatedAt: new Date(),
       },
     ];
 
@@ -174,6 +187,9 @@ describe('SendNotification', () => {
         id: 'user-123',
         email: 'test@example.com',
         locale: 'en-US',
+        tenantId: 'tenant-1',
+        createdAt: new Date(),
+        updatedAt: new Date(),
       },
     ];
 
