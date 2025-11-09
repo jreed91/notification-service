@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Subscriptions } from '../pages/Subscriptions';
 import * as subscriptionApi from '../api/subscriptions';
@@ -25,26 +25,12 @@ describe('Subscriptions', () => {
   const renderSubscriptions = (userId = 'user-123') => {
     return render(
       <QueryClientProvider client={queryClient}>
-        <BrowserRouter>
+        <MemoryRouter initialEntries={[`/users/${userId}/subscriptions`]} initialIndex={0}>
           <Routes>
             <Route path="/users/:userId/subscriptions" element={<Subscriptions />} />
           </Routes>
-        </BrowserRouter>
-      </QueryClientProvider>,
-      {
-        wrapper: ({ children }) => (
-          <BrowserRouter>
-            <Routes>
-              <Route path="/" element={
-                <div onClick={() => window.history.pushState({}, '', `/users/${userId}/subscriptions`)}>
-                  {children}
-                </div>
-              } />
-              <Route path="/users/:userId/subscriptions" element={<Subscriptions />} />
-            </Routes>
-          </BrowserRouter>
-        ),
-      }
+        </MemoryRouter>
+      </QueryClientProvider>
     );
   };
 
@@ -56,15 +42,7 @@ describe('Subscriptions', () => {
       templates: [],
     });
 
-    render(
-      <QueryClientProvider client={queryClient}>
-        <BrowserRouter initialEntries={['/users/user-123/subscriptions']} initialIndex={0}>
-          <Routes>
-            <Route path="/users/:userId/subscriptions" element={<Subscriptions />} />
-          </Routes>
-        </BrowserRouter>
-      </QueryClientProvider>
-    );
+    renderSubscriptions();
 
     await waitFor(() => {
       expect(screen.getByText('Notification Preferences')).toBeInTheDocument();
@@ -79,15 +57,7 @@ describe('Subscriptions', () => {
       templates: [],
     });
 
-    render(
-      <QueryClientProvider client={queryClient}>
-        <BrowserRouter initialEntries={['/users/user-123/subscriptions']} initialIndex={0}>
-          <Routes>
-            <Route path="/users/:userId/subscriptions" element={<Subscriptions />} />
-          </Routes>
-        </BrowserRouter>
-      </QueryClientProvider>
-    );
+    renderSubscriptions();
 
     await waitFor(() => {
       expect(screen.getByText(/user-123/)).toBeInTheDocument();
@@ -119,15 +89,7 @@ describe('Subscriptions', () => {
       templates: mockTemplates,
     });
 
-    render(
-      <QueryClientProvider client={queryClient}>
-        <BrowserRouter initialEntries={['/users/user-123/subscriptions']} initialIndex={0}>
-          <Routes>
-            <Route path="/users/:userId/subscriptions" element={<Subscriptions />} />
-          </Routes>
-        </BrowserRouter>
-      </QueryClientProvider>
-    );
+    renderSubscriptions();
 
     await waitFor(() => {
       expect(screen.getByText('Welcome Message')).toBeInTheDocument();
@@ -154,15 +116,7 @@ describe('Subscriptions', () => {
       templates: mockTemplates,
     });
 
-    render(
-      <QueryClientProvider client={queryClient}>
-        <BrowserRouter initialEntries={['/users/user-123/subscriptions']} initialIndex={0}>
-          <Routes>
-            <Route path="/users/:userId/subscriptions" element={<Subscriptions />} />
-          </Routes>
-        </BrowserRouter>
-      </QueryClientProvider>
-    );
+    renderSubscriptions();
 
     await waitFor(() => {
       const checkboxes = screen.getAllByRole('checkbox');

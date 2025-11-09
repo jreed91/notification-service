@@ -6,7 +6,6 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { SendNotification } from '../pages/SendNotification';
 import * as templateApi from '../api/templates';
 import * as userApi from '../api/users';
-import * as notificationApi from '../api/notifications';
 
 // Mock the APIs
 vi.mock('../api/templates');
@@ -41,7 +40,7 @@ describe('SendNotification', () => {
     vi.spyOn(userApi.userApi, 'list').mockResolvedValue({ users: [] });
 
     renderSendNotification();
-    expect(screen.getByText('Send Notification')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Send Notification' })).toBeInTheDocument();
   });
 
   it('should render description text', async () => {
@@ -71,7 +70,7 @@ describe('SendNotification', () => {
     renderSendNotification();
 
     await waitFor(() => {
-      expect(screen.getByLabelText('Template')).toBeInTheDocument();
+      expect(screen.getByText('Template')).toBeInTheDocument();
       expect(screen.getByText(/Welcome Message \(welcome\)/)).toBeInTheDocument();
     });
   });
@@ -93,7 +92,7 @@ describe('SendNotification', () => {
     renderSendNotification();
 
     await waitFor(() => {
-      expect(screen.getByLabelText('User')).toBeInTheDocument();
+      expect(screen.getByText('User')).toBeInTheDocument();
       expect(screen.getByText('test@example.com')).toBeInTheDocument();
     });
   });
@@ -105,7 +104,7 @@ describe('SendNotification', () => {
     renderSendNotification();
 
     await waitFor(() => {
-      expect(screen.getByLabelText(/Variables \(JSON\)/)).toBeInTheDocument();
+      expect(screen.getByText(/Variables \(JSON\)/)).toBeInTheDocument();
     });
   });
 
@@ -139,11 +138,13 @@ describe('SendNotification', () => {
 
     renderSendNotification();
 
+    // Wait for templates to load
     await waitFor(() => {
-      expect(screen.getByLabelText('Template')).toBeInTheDocument();
+      expect(screen.getByText('Welcome (welcome)')).toBeInTheDocument();
     });
 
-    const templateSelect = screen.getByLabelText('Template');
+    const selects = screen.getAllByRole('combobox');
+    const templateSelect = selects[0]; // First select is Template
     await user.selectOptions(templateSelect, 'welcome');
 
     await waitFor(() => {
@@ -185,16 +186,19 @@ describe('SendNotification', () => {
 
     renderSendNotification();
 
+    // Wait for templates and users to load
     await waitFor(() => {
-      expect(screen.getByLabelText('Template')).toBeInTheDocument();
+      expect(screen.getByText('Welcome (welcome)')).toBeInTheDocument();
+      expect(screen.getByText('test@example.com')).toBeInTheDocument();
     });
 
-    // Select template and user
-    await user.selectOptions(screen.getByLabelText('Template'), 'welcome');
-    await user.selectOptions(screen.getByLabelText('User'), 'user-123');
+    // Select template and user using role-based queries
+    const selects = screen.getAllByRole('combobox');
+    await user.selectOptions(selects[0], 'welcome'); // Template select
+    await user.selectOptions(selects[1], 'user-123'); // User select
 
     // Enter invalid JSON
-    const variablesTextarea = screen.getByLabelText(/Variables \(JSON\)/);
+    const variablesTextarea = screen.getByPlaceholderText('{"name": "John", "amount": 100}');
     await user.clear(variablesTextarea);
     await user.type(variablesTextarea, 'invalid json');
 

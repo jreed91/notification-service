@@ -36,7 +36,10 @@ describe('Users', () => {
     });
 
     renderUsers();
-    expect(screen.getByText('Users')).toBeInTheDocument();
+
+    await waitFor(() => {
+      expect(screen.getByText('Users')).toBeInTheDocument();
+    });
   });
 
   it('should display loading state', () => {

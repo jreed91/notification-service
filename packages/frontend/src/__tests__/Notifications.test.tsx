@@ -38,7 +38,10 @@ describe('Notifications', () => {
     });
 
     renderNotifications();
-    expect(screen.getByText('Notification History')).toBeInTheDocument();
+
+    await waitFor(() => {
+      expect(screen.getByText('Notification History')).toBeInTheDocument();
+    });
   });
 
   it('should display loading state', () => {

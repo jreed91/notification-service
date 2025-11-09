@@ -4,19 +4,10 @@ import userEvent from '@testing-library/user-event';
 import { BrowserRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Templates } from '../pages/Templates';
+import * as templateApi from '../api/templates';
 
 // Mock the template API
-const mockTemplateApi = {
-  list: vi.fn(),
-  create: vi.fn(),
-  get: vi.fn(),
-  update: vi.fn(),
-  delete: vi.fn(),
-};
-
-vi.mock('../api/templates', () => ({
-  templateApi: mockTemplateApi,
-}));
+vi.mock('../api/templates');
 
 describe('Templates', () => {
   let queryClient: QueryClient;
@@ -41,7 +32,7 @@ describe('Templates', () => {
   };
 
   it('should render templates page title', async () => {
-    mockTemplateApi.list.mockResolvedValue({
+    vi.spyOn(templateApi.templateApi, 'list').mockResolvedValue({
       templates: [],
     });
 
@@ -53,7 +44,7 @@ describe('Templates', () => {
   });
 
   it('should display loading state', () => {
-    mockTemplateApi.list.mockImplementation(
+    vi.spyOn(templateApi.templateApi, 'list').mockImplementation(
       () => new Promise(() => {}) // Never resolves
     );
 
@@ -91,7 +82,7 @@ describe('Templates', () => {
       },
     ];
 
-    mockTemplateApi.list.mockResolvedValue({
+    vi.spyOn(templateApi.templateApi, 'list').mockResolvedValue({
       templates: mockTemplates,
     });
 
@@ -104,7 +95,7 @@ describe('Templates', () => {
   });
 
   it('should have create template button', async () => {
-    mockTemplateApi.list.mockResolvedValue({
+    vi.spyOn(templateApi.templateApi, 'list').mockResolvedValue({
       templates: [],
     });
 
@@ -119,7 +110,7 @@ describe('Templates', () => {
     const user = userEvent.setup();
     const alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => {});
 
-    mockTemplateApi.list.mockResolvedValue({
+    vi.spyOn(templateApi.templateApi, 'list').mockResolvedValue({
       templates: [],
     });
 
@@ -137,7 +128,7 @@ describe('Templates', () => {
   });
 
   it('should display empty state when no templates', async () => {
-    mockTemplateApi.list.mockResolvedValue({
+    vi.spyOn(templateApi.templateApi, 'list').mockResolvedValue({
       templates: [],
     });
 
@@ -162,7 +153,7 @@ describe('Templates', () => {
       },
     ];
 
-    mockTemplateApi.list.mockResolvedValue({
+    vi.spyOn(templateApi.templateApi, 'list').mockResolvedValue({
       templates: mockTemplates,
     });
 
