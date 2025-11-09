@@ -19,8 +19,8 @@ export const users = pgTable('users', {
   phoneNumber: varchar('phone_number', { length: 50 }),
   locale: varchar('locale', { length: 10 }).notNull().default('en-US'),
   timezone: varchar('timezone', { length: 50 }),
-  apnsDeviceToken: text('apns_device_token'),
-  fcmDeviceToken: text('fcm_device_token'),
+  apnsTokens: text('apns_tokens').array(), // Array of APNs device tokens for multi-device support
+  fcmTokens: text('fcm_tokens').array(), // Array of FCM device tokens for multi-device support
   createdAt: timestamp('created_at').defaultNow(),
   updatedAt: timestamp('updated_at').defaultNow(),
 }, (table) => ({
@@ -29,6 +29,7 @@ export const users = pgTable('users', {
   phoneNumberIdx: index('idx_users_phone_number').on(table.phoneNumber),
   tenantEmailUnique: uniqueIndex('users_tenant_id_email_key').on(table.tenantId, table.email),
   tenantPhoneUnique: uniqueIndex('users_tenant_id_phone_number_key').on(table.tenantId, table.phoneNumber),
+  tenantCreatedIdx: index('idx_users_tenant_created').on(table.tenantId, table.createdAt),
 }));
 
 // Notification templates table

@@ -1,0 +1,464 @@
+openapi: 3.0.3
+info:
+  title: User Management API
+  description: |
+    REST API for managing notification service end users.
+    All endpoints require tenant authentication via X-API-Key header.
+    Multi-tenant isolation is enforced at all levels.
+  version: 1.0.0
+  contact:
+    name: Notification Service
+
+servers:
+  - url: http://localhost:3000/api
+    description: Local development
+  - url: https://api.notifications.example.com/api
+    description: Production
+
+security:
+  - ApiKeyAuth: []
+
+tags:
+  - name: Users
+    description: User CRUD operations
+
+paths:
+  /users:
+    get:
+      summary: List all users for authenticated tenant
+      tags: [Users]
+      operationId: listUsers
+      parameters:
+        - name: page
+          in: query
+          description: Page number (1-indexed)
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          description: Results per page
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 50
+        - name: email
+          in: query
+          description: Filter by email (exact match)
+          required: false
+          schema:
+            type: string
+            format: email
+        - name: phone
+          in: query
+          description: Filter by phone number (exact match, E.164 format)
+          required: false
+          schema:
+            type: string
+            pattern: '^\+[1-9]\d{1,14}$'
+      responses:
+        '200':
+          description: List of users with pagination metadata
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListUsersResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+    post:
+      summary: Create a new user
+      tags: [Users]
+      operationId: createUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUserRequest'
+      responses:
+        '201':
+          description: User created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /users/{userId}:
+    get:
+      summary: Get user by ID
+      tags: [Users]
+      operationId: getUserById
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: User UUID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: User details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+    put:
+      summary: Update user
+      tags: [Users]
+      operationId: updateUser
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: User UUID
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUserRequest'
+      responses:
+        '200':
+          description: User updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+    delete:
+      summary: Delete user
+      description: |
+        Permanently deletes user and all related data (notifications, subscriptions).
+        Implements GDPR "right to be forgotten" with cascade deletion.
+      tags: [Users]
+      operationId: deleteUser
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: User UUID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: User deleted successfully (no content)
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: Tenant API key for authentication
+
+  schemas:
+    CreateUserRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          description: User's email address (RFC 5322 format)
+          example: user@example.com
+        phoneNumber:
+          type: string
+          pattern: '^\+[1-9]\d{1,14}$'
+          description: User's phone number (E.164 format with country code)
+          example: '+14155552671'
+        locale:
+          type: string
+          pattern: '^[a-z]{2}-[A-Z]{2}$'
+          default: 'en-US'
+          description: User's preferred locale for notifications
+          example: 'en-US'
+        timezone:
+          type: string
+          description: User's timezone (IANA timezone database format)
+          example: 'America/New_York'
+        apnsTokens:
+          type: array
+          items:
+            type: string
+          description: Array of Apple Push Notification tokens (iOS/macOS devices)
+          example: ['abc123token', 'def456token']
+        fcmTokens:
+          type: array
+          items:
+            type: string
+          description: Array of Firebase Cloud Messaging tokens (Android devices)
+          example: ['xyz789token']
+      required: []
+      description: |
+        At least one contact method required: email, phoneNumber, apnsTokens, or fcmTokens
+
+    UpdateUserRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          description: User's email address (RFC 5322 format)
+          example: user@example.com
+        phoneNumber:
+          type: string
+          pattern: '^\+[1-9]\d{1,14}$'
+          description: User's phone number (E.164 format with country code)
+          example: '+14155552671'
+        locale:
+          type: string
+          pattern: '^[a-z]{2}-[A-Z]{2}$'
+          description: User's preferred locale for notifications
+          example: 'es-ES'
+        timezone:
+          type: string
+          description: User's timezone (IANA timezone database format)
+          example: 'Europe/London'
+        apnsTokens:
+          type: array
+          items:
+            type: string
+          description: Array of Apple Push Notification tokens (replaces entire array)
+          example: ['newtoken123']
+        fcmTokens:
+          type: array
+          items:
+            type: string
+          description: Array of Firebase Cloud Messaging tokens (replaces entire array)
+          example: ['newtoken456']
+      required: []
+      description: All fields optional - only provided fields will be updated
+
+    UserResponse:
+      type: object
+      required:
+        - id
+        - tenantId
+        - locale
+        - apnsTokens
+        - fcmTokens
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique user identifier
+          example: '550e8400-e29b-41d4-a716-446655440000'
+        tenantId:
+          type: string
+          format: uuid
+          description: Tenant this user belongs to
+          example: '6d96de6c-0d52-49b7-91f9-9c1e2183c6a0'
+        email:
+          type: string
+          format: email
+          nullable: true
+          description: User's email address
+          example: user@example.com
+        phoneNumber:
+          type: string
+          nullable: true
+          description: User's phone number (E.164 format)
+          example: '+14155552671'
+        locale:
+          type: string
+          description: User's preferred locale
+          example: 'en-US'
+        timezone:
+          type: string
+          nullable: true
+          description: User's timezone
+          example: 'America/New_York'
+        apnsTokens:
+          type: array
+          items:
+            type: string
+          description: Array of Apple Push Notification tokens
+          example: ['abc123token', 'def456token']
+        fcmTokens:
+          type: array
+          items:
+            type: string
+          description: Array of Firebase Cloud Messaging tokens
+          example: ['xyz789token']
+        createdAt:
+          type: string
+          format: date-time
+          description: UTC timestamp when user was created
+          example: '2025-11-09T18:30:00.000Z'
+        updatedAt:
+          type: string
+          format: date-time
+          description: UTC timestamp when user was last updated
+          example: '2025-11-09T18:30:00.000Z'
+
+    ListUsersResponse:
+      type: object
+      required:
+        - users
+        - pagination
+      properties:
+        users:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserResponse'
+        pagination:
+          type: object
+          required:
+            - page
+            - limit
+            - total
+            - totalPages
+            - hasNextPage
+            - hasPrevPage
+          properties:
+            page:
+              type: integer
+              description: Current page number
+              example: 1
+            limit:
+              type: integer
+              description: Results per page
+              example: 50
+            total:
+              type: integer
+              description: Total number of users for this tenant
+              example: 1234
+            totalPages:
+              type: integer
+              description: Total number of pages
+              example: 25
+            hasNextPage:
+              type: boolean
+              description: Whether there is a next page
+              example: true
+            hasPrevPage:
+              type: boolean
+              description: Whether there is a previous page
+              example: false
+
+    ErrorResponse:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: string
+          description: Error message
+        details:
+          type: array
+          items:
+            type: object
+            properties:
+              field:
+                type: string
+              message:
+                type: string
+              code:
+                type: string
+          description: Validation error details (for 400 responses)
+
+  responses:
+    ValidationError:
+      description: Request validation failed
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            invalidEmail:
+              summary: Invalid email format
+              value:
+                error: 'Invalid request'
+                details:
+                  - field: 'email'
+                    message: 'Invalid email format'
+                    code: 'INVALID_EMAIL'
+            duplicateEmail:
+              summary: Duplicate email
+              value:
+                error: 'Email already exists for this tenant'
+            noContactMethod:
+              summary: Missing contact method
+              value:
+                error: 'User must have at least one contact method (email, phone, or device token)'
+
+    Unauthorized:
+      description: Authentication failed - invalid or missing API key
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error: 'Invalid API key'
+
+    NotFound:
+      description: Resource not found or access denied
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error: 'User not found'
+
+    Conflict:
+      description: Resource conflict (e.g., duplicate email/phone)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error: 'Email already exists for this tenant'
+
+    InternalError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error: 'Internal server error'
+            message: 'An unexpected error occurred'

@@ -38,7 +38,7 @@ export async function createUser(req: AuthRequest, res: Response): Promise<void>
 /**
  * GET /api/users/:id - Get user by ID
  */
-export async function getUser(req: AuthRequest, res: Response): Promise<void> {
+export async function getUserById(req: AuthRequest, res: Response): Promise<void> {
   try {
     if (!req.tenant) {
       res.status(401).json({ error: 'Authentication required' });
@@ -64,7 +64,7 @@ export async function getUser(req: AuthRequest, res: Response): Promise<void> {
 /**
  * GET /api/users - List users with pagination
  */
-export async function getUsers(req: AuthRequest, res: Response): Promise<void> {
+export async function listUsers(req: AuthRequest, res: Response): Promise<void> {
   try {
     if (!req.tenant) {
       res.status(401).json({ error: 'Authentication required' });

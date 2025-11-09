@@ -33,8 +33,8 @@ export interface User {
   phoneNumber?: string;
   locale: string; // e.g., 'en-US', 'es-ES'
   timezone?: string;
-  apnsDeviceToken?: string;
-  fcmDeviceToken?: string;
+  apnsTokens: string[]; // Array of Apple Push Notification tokens (multi-device support)
+  fcmTokens: string[]; // Array of Firebase Cloud Messaging tokens (multi-device support)
   createdAt: Date;
   updatedAt: Date;
 }
@@ -131,8 +131,42 @@ export interface UpdateSubscriptionRequest {
 export interface CreateUserRequest {
   email?: string;
   phoneNumber?: string;
+  locale?: string; // Default: 'en-US'
+  timezone?: string;
+  apnsTokens?: string[]; // Array of device tokens
+  fcmTokens?: string[]; // Array of device tokens
+}
+
+export interface UpdateUserRequest {
+  email?: string;
+  phoneNumber?: string;
+  locale?: string;
+  timezone?: string;
+  apnsTokens?: string[]; // Replaces entire array
+  fcmTokens?: string[]; // Replaces entire array
+}
+
+export interface UserResponse {
+  id: string;
+  tenantId: string;
+  email?: string;
+  phoneNumber?: string;
   locale: string;
   timezone?: string;
-  apnsDeviceToken?: string;
-  fcmDeviceToken?: string;
+  apnsTokens: string[];
+  fcmTokens: string[];
+  createdAt: string; // ISO 8601 format
+  updatedAt: string; // ISO 8601 format
+}
+
+export interface ListUsersResponse {
+  users: UserResponse[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+    hasNextPage: boolean;
+    hasPrevPage: boolean;
+  };
 }
