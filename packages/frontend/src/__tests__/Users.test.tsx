@@ -33,6 +33,14 @@ describe('Users', () => {
   it('should render users page title', async () => {
     vi.spyOn(userApi.userApi, 'list').mockResolvedValue({
       users: [],
+      pagination: {
+        page: 1,
+        limit: 50,
+        total: 0,
+        totalPages: 0,
+        hasNextPage: false,
+        hasPrevPage: false,
+      },
     });
 
     renderUsers();
@@ -59,8 +67,10 @@ describe('Users', () => {
         phoneNumber: '+1234567890',
         locale: 'en-US',
         tenantId: 'tenant-1',
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        apnsTokens: [],
+        fcmTokens: [],
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
       },
       {
         id: 'user-456',
@@ -68,13 +78,23 @@ describe('Users', () => {
         phoneNumber: '+0987654321',
         locale: 'es-ES',
         tenantId: 'tenant-1',
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        apnsTokens: [],
+        fcmTokens: [],
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
       },
     ];
 
     vi.spyOn(userApi.userApi, 'list').mockResolvedValue({
       users: mockUsers,
+      pagination: {
+        page: 1,
+        limit: 50,
+        total: 2,
+        totalPages: 1,
+        hasNextPage: false,
+        hasPrevPage: false,
+      },
     });
 
     renderUsers();
@@ -90,6 +110,14 @@ describe('Users', () => {
   it('should have add user button', async () => {
     vi.spyOn(userApi.userApi, 'list').mockResolvedValue({
       users: [],
+      pagination: {
+        page: 1,
+        limit: 50,
+        total: 0,
+        totalPages: 0,
+        hasNextPage: false,
+        hasPrevPage: false,
+      },
     });
 
     renderUsers();
@@ -102,6 +130,14 @@ describe('Users', () => {
   it('should display empty state when no users', async () => {
     vi.spyOn(userApi.userApi, 'list').mockResolvedValue({
       users: [],
+      pagination: {
+        page: 1,
+        limit: 50,
+        total: 0,
+        totalPages: 0,
+        hasNextPage: false,
+        hasPrevPage: false,
+      },
     });
 
     renderUsers();
@@ -118,29 +154,45 @@ describe('Users', () => {
         id: 'user-123',
         email: 'user@example.com',
         locale: 'en-US',
-        apnsDeviceToken: 'apns-token',
-        fcmDeviceToken: 'fcm-token',
+        apnsTokens: ['apns-token'],
+        fcmTokens: ['fcm-token'],
         tenantId: 'tenant-1',
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
       },
     ];
 
     vi.spyOn(userApi.userApi, 'list').mockResolvedValue({
       users: mockUsers,
+      pagination: {
+        page: 1,
+        limit: 50,
+        total: 1,
+        totalPages: 1,
+        hasNextPage: false,
+        hasPrevPage: false,
+      },
     });
 
     renderUsers();
 
     await waitFor(() => {
-      expect(screen.getByText('iOS')).toBeInTheDocument();
-      expect(screen.getByText('Android')).toBeInTheDocument();
+      expect(screen.getByText('Apple: 1')).toBeInTheDocument();
+      expect(screen.getByText('Google: 1')).toBeInTheDocument();
     });
   });
 
   it('should display table headers', async () => {
     vi.spyOn(userApi.userApi, 'list').mockResolvedValue({
       users: [],
+      pagination: {
+        page: 1,
+        limit: 50,
+        total: 0,
+        totalPages: 0,
+        hasNextPage: false,
+        hasPrevPage: false,
+      },
     });
 
     renderUsers();

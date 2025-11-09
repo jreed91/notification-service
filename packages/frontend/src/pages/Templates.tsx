@@ -48,7 +48,9 @@ export function Templates() {
       <CreateTemplateModal
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
-        onSubmit={createMutation.mutateAsync}
+        onSubmit={async (data) => {
+          await createMutation.mutateAsync(data);
+        }}
       />
 
       <div className="grid gap-6">

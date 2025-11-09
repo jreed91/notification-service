@@ -275,3 +275,10 @@ The frontend now includes a template creation UI:
 - Template translations are JSONB fields - use PostgreSQL JSONB operators for querying
 - Frontend expects backend at `http://localhost:3000` in development
 - Use `turbo run` commands for optimal caching and performance
+
+## Active Technologies
+- TypeScript 5.3.3 + Node.js (backend), TypeScript 5.3.3 + React 18 (frontend) + Express 4.x (backend), React 18 + Vite 5.x (frontend), PostgreSQL 14 (database), Drizzle ORM 0.44.x (001-add-user-functionality)
+- PostgreSQL with existing `users` table schema (001-add-user-functionality)
+
+## Recent Changes
+- 001-add-user-functionality: Added TypeScript 5.3.3 + Node.js (backend), TypeScript 5.3.3 + React 18 (frontend) + Express 4.x (backend), React 18 + Vite 5.x (frontend), PostgreSQL 14 (database), Drizzle ORM 0.44.x

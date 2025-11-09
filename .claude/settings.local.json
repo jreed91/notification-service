@@ -19,7 +19,19 @@
       "Bash(PGPASSWORD=postgres psql:*)",
       "Bash(docker exec:*)",
       "SlashCommand(/speckit.specify:*)",
-      "Bash(git fetch:*)"
+      "Bash(git fetch:*)",
+      "Bash(.specify/scripts/bash/create-new-feature.sh:*)",
+      "Bash(.specify/scripts/bash/update-agent-context.sh:*)",
+      "Bash(.specify/scripts/bash/check-prerequisites.sh:*)",
+      "Bash(if [ -d \"/Users/jreed/bench/notification-service/specs/001-add-user-functionality/checklists\" ])",
+      "Bash(then find /Users/jreed/bench/notification-service/specs/001-add-user-functionality/checklists -name \"*.md\" -type f)",
+      "Bash(else echo \"NO_CHECKLISTS\")",
+      "Bash(fi)",
+      "Bash(npm run lint:*)",
+      "Bash(git log:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(git add:*)"
     ],
     "deny": [],
     "ask": []

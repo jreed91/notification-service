@@ -181,14 +181,16 @@ export class NotificationService {
         return null;
       }
 
-      // Determine recipient
+      // Determine recipient(s)
       let recipient: string | undefined;
       switch (channel) {
         case DeliveryChannel.APPLE_PUSH:
-          recipient = user.apnsDeviceToken;
+          // Use first token from array, or send to all tokens in future enhancement
+          recipient = user.apnsTokens?.[0];
           break;
         case DeliveryChannel.GOOGLE_PUSH:
-          recipient = user.fcmDeviceToken;
+          // Use first token from array, or send to all tokens in future enhancement
+          recipient = user.fcmTokens?.[0];
           break;
         case DeliveryChannel.SMS:
           recipient = user.phoneNumber;
