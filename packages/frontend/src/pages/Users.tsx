@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { userApi } from '../api/users';
 import { Link } from 'react-router-dom';

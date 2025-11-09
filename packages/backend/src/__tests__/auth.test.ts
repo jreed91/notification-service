@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express';
+import { Response, NextFunction } from 'express';
 import { authenticateTenant, AuthRequest } from '../middleware/auth';
 import { db } from '../database/client';
 

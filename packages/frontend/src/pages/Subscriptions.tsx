@@ -3,7 +3,6 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { subscriptionApi } from '../api/subscriptions';
 import { templateApi } from '../api/templates';
 import { DeliveryChannel } from '@notification-service/shared';
-import { useState } from 'react';
 
 export function Subscriptions() {
   const { userId } = useParams<{ userId: string }>();

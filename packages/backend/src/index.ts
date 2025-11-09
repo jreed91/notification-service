@@ -30,7 +30,7 @@ app.get('/health', (req, res) => {
 app.use('/api', routes);
 
 // Error handling
-app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
+app.use((err: Error, req: express.Request, res: express.Response, _next: express.NextFunction) => {
   console.error('Error:', err);
   res.status(500).json({
     error: 'Internal server error',

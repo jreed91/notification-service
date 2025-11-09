@@ -4,7 +4,6 @@ import {
   NotificationStatus,
   NotificationTemplate,
   User,
-  Notification,
   SendNotificationRequest,
   SendNotificationResponse,
 } from '@notification-service/shared';

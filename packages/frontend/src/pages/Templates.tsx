@@ -1,11 +1,9 @@
-import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { templateApi } from '../api/templates';
 import { Plus, Trash2, Edit } from 'lucide-react';
 import { DeliveryChannel } from '@notification-service/shared';
 
 export function Templates() {
-  const [showCreateModal, setShowCreateModal] = useState(false);
   const queryClient = useQueryClient();
 
   const { data, isLoading } = useQuery({
@@ -29,7 +27,7 @@ export function Templates() {
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold text-gray-900">Notification Templates</h1>
         <button
-          onClick={() => setShowCreateModal(true)}
+          onClick={() => alert('Create template modal coming soon')}
           className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
         >
           <Plus className="h-4 w-4" />
